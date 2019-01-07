@@ -1,0 +1,36 @@
+{
+    "name": "rwarasaurus/error",
+    "license": "Apache-2.0",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Kieron",
+            "email": "hello@madebykieron.co.uk",
+            "homepage": "http://madebykieron.co.uk",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "~2",
+        "phpstan/phpstan": "~0",
+        "symfony/var-dumper": "~4",
+        "phpunit/phpunit": "~7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Error\\": "src/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "scripts": {
+        "psr": [
+            "./bin/php-cs-fixer fix ./src --allow-risky=yes --rules=@PSR2,no_unused_imports,native_function_invocation,normalize_index_brace,object_operator_without_whitespace,ordered_imports,void_return,psr4"
+        ]
+    }
+}

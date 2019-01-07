@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?php echo $e->getMessage(); ?></title>
+</head>
+<body>
+    <div>
+        <div><?php echo $e->getMessage(); ?></div>
+        <div>in <?php echo $e->getFile(); ?> on line <?php echo $e->getLine(); ?></div>
+        <?php foreach($trace->getFrames() as $frame):
+            $context = $frame->getContext();
+            $snippet = $context->getPlaceInFile() ?>
+        <ol start="<?php echo key($snippet); ?>">
+            <?php foreach($snippet as $code): ?>
+            <li><?php echo $code; ?></li>
+            <?php endforeach; ?>
+        </ol>
+        <?php endforeach; ?>
+    </div>
+</body>
+</html>
