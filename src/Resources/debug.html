@@ -2,20 +2,47 @@
 <html>
 <head>
     <title><?php echo $e->getMessage(); ?></title>
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <style>
+        body { background: #eee; }
+        .container { background: #fff; width: 60rem; margin: 1rem auto; }
+        .column { padding: 1rem; }
+    </style>
 </head>
 <body>
-    <div>
-        <div><?php echo $e->getMessage(); ?></div>
-        <div>in <?php echo $e->getFile(); ?> on line <?php echo $e->getLine(); ?></div>
-        <?php foreach($trace->getFrames() as $frame):
-            $context = $frame->getContext();
-            $snippet = $context->getPlaceInFile() ?>
-        <ol start="<?php echo key($snippet); ?>">
-            <?php foreach($snippet as $code): ?>
-            <li><?php echo $code; ?></li>
-            <?php endforeach; ?>
-        </ol>
-        <?php endforeach; ?>
+    <div class="container">
+         <div class="columns">
+            <div class="column col-12">
+                <h3>Uncaught <?php echo get_class($e); ?></h3>
+                <p><?php echo $e->getMessage(); ?></p>
+                <p><code><?php echo $e->getFile(); ?></code> on line
+                    <code><?php echo $e->getLine(); ?></code></p>
+
+                <p>Context</p>
+                <?php $frames = $trace->getFrames();
+                    $first = $frames[0];
+                    $context = $first->getContext();
+                    $snippet = $context->getPlaceInFile();
+                    $pad = strlen(max(array_keys($snippet))); ?>
+
+<pre class="code"><code><?php foreach($snippet as $line => $code): ?>
+<?php echo str_pad($line, $pad, ' ', STR_PAD_LEFT); ?>. <?php echo $code; ?>
+<?php endforeach; ?></code></pre>
+
+                <p>Stacktrace</p>
+                <table class="table">
+                    <tbody>
+                        <?php foreach($frames as $frame): ?>
+                        <tr>
+                            <td><code><?php echo $frame->getCaller(); ?></code></td>
+                            <td>in <code><?php echo $frame->getFile(); ?></code> on line
+                                <code><?php echo $frame->getLine(); ?></code></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </body>
 </html>

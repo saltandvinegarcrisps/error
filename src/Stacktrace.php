@@ -26,12 +26,12 @@ class Stacktrace
     {
         $frames = $this->exception->getTrace();
 
-        if (!isset($frames[0]['file']) || $frames[0]['file'] !== $this->exception->getFile()) {
-            \array_unshift($frames, [
-                'file' => $this->exception->getFile(),
-                'line' => $this->exception->getLine(),
-            ]);
-        }
+        // if (!isset($frames[0]['file']) || $frames[0]['file'] !== $this->exception->getFile()) {
+        //     \array_unshift($frames, [
+        //         'file' => $this->exception->getFile(),
+        //         'line' => $this->exception->getLine(),
+        //     ]);
+        // }
 
         return $frames;
     }
