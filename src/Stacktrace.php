@@ -35,6 +35,14 @@ class Stacktrace
     }
 
     /**
+     * @return Context
+     */
+    public function getContext(): Context
+    {
+        return new Context($this->exception->getFile(), $this->exception->getLine());
+    }
+
+    /**
      * @return array
      */
     public function getFrames(): array

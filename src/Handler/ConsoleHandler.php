@@ -8,11 +8,6 @@ class ConsoleHandler implements HandlerInterface
 {
     use ExceptionMessageTrait;
 
-    public static function isConsole(): bool
-    {
-        return \php_sapi_name() === 'cli';
-    }
-
     public function handle(Throwable $e): void
     {
         $handle = \fopen('php://stderr', 'a');

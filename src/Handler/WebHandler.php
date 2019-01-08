@@ -2,6 +2,7 @@
 
 namespace Error\Handler;
 
+use Error\Context;
 use Error\Stacktrace;
 use Throwable;
 
@@ -9,9 +10,11 @@ class WebHandler implements HandlerInterface
 {
     use ExceptionMessageTrait;
 
-    public static function isWeb(): bool
+    protected $debug;
+
+    public function __construct(bool $debug = false)
     {
-        return \strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'text/html') !== false;
+        $this->debug = $debug;
     }
 
     public function handle(Throwable $e): void
@@ -25,6 +28,8 @@ class WebHandler implements HandlerInterface
             $stack[] = [$e, new Stacktrace($e)];
         }
 
-        require __DIR__ . '/../Resources/debug.html';
+        $file = __DIR__ . '/../Resources/'.($this->debug ? 'debug' : 'message').'.html';
+
+        require $file;
     }
 }

@@ -54,13 +54,29 @@ class Context
      */
     public function getSnippet(): string
     {
-        $snippet = $this->getPlaceInFile();
-        $pad = \strlen((string) \max(\array_keys($snippet)));
+        $lines = $this->getPlaceInFile();
+        $pad = \strlen((string) \max(\array_keys($lines)));
+        $block = '<div class="block">';
 
-        foreach (\array_keys($snippet) as $line) {
-            $snippet[$line] = \str_pad((string) $line, $pad, ' ', STR_PAD_LEFT).' '.$snippet[$line];
+        foreach ($lines as $line => $code) {
+            $line = \str_pad((string) $line, $pad, ' ', STR_PAD_LEFT);
+
+            $class = ['line'];
+            if ($this->line == $line) {
+                $class[] = 'highlight';
+            }
+            $className = implode(' ', $class);
+
+            $block .= sprintf(
+                '<span class="%s"><span class="line-number">%s</span> %s</span>',
+                $className,
+                $line,
+                \htmlspecialchars($code)
+            );
         }
 
-        return \htmlspecialchars(\implode('', $snippet));
+        $block .= '</div>';
+
+        return $block;
     }
 }

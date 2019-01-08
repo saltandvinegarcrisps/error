@@ -9,11 +9,6 @@ class JsonHandler implements HandlerInterface
 {
     use ExceptionMessageTrait;
 
-    public static function isJson(): bool
-    {
-        return \strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest';
-    }
-
     public function handle(Throwable $e): void
     {
         $id = \sha1($this->getMessage($e));

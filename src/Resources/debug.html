@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Whoops</title>
-    <link rel="stylesheet" defer href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/default.min.css">
+    <title>Internal Server Error</title>
     <style>
         :root { font-size: 16px; }
         html { box-sizing: border-box; }
@@ -12,9 +11,14 @@
         table { width: 100%; border-collapse: collapse; }
         table td { padding: .4rem .8rem; border-bottom: 1px solid #eee; }
         table tr:last-child td { border-bottom: none; }
-        code, pre { font-size: inherit; font-family: monospace; }
-        pre { line-height: 1.8rem; background: #F0F0F0;  }
-        pre code { padding: 0.5em; display: block; }
+
+        .block { margin: 1rem 0; display: block; line-height: 2rem; font-family: monospace; }
+        .block .line { background: #eee; display: block; font-family: monospace; white-space: pre; display: block; }
+        .block .line-number { line-height: 2rem; display: inline-block; background: #ddd; padding: 0 .4rem 0 .8rem; }
+
+        .block .highlight { background: #ccc; }
+        .block .highlight .line-number { background: #aaa; }
+
         .container { width: 80rem; margin: 1rem auto; }
         .section { background: #fff; margin: 1rem 0; padding: 1rem 2rem; }
         .frame { border-bottom: 1px solid #eee; }
@@ -29,21 +33,28 @@
 </head>
 <body>
     <div class="container">
-        <?php foreach($stack as [$e, $trace]): $frames = $trace->getFrames(); ?>
+        <?php foreach($stack as [$e, $trace]): ?>
         <div class="section">
             <h2><?php echo get_class($e); ?></h2>
             <p><?php echo $e->getMessage(); ?></p>
             <p class="quiet"><code><?php echo $e->getFile(); ?></code> on line <code><?php echo $e->getLine(); ?></code></p>
 
+            <?php echo $trace->getContext()->getSnippet(); ?>
+
             <p><b>Stacktrace</b></p>
-            <?php foreach($frames as $frame): ?>
+            <?php foreach($trace->getFrames() as $frame): ?>
             <div class="frame">
                 <div class="frame-header">
-                    <span class="quiet"><code><?php echo $frame->getCaller(); ?></code> in <code><?php echo $frame->getFile(); ?></code>
-                    on line <code><?php echo $frame->getLine(); ?></code></span>
+                    <span class="quiet">
+                        <code><?php echo $frame->getCaller(); ?></code>
+                        <?php if($frame->hasFile()): ?>
+                        in <code><?php echo $frame->getFile(); ?></code> on line <code><?php echo $frame->getLine(); ?></code>
+                        <?php endif; ?>
+                    </span>
                 </div>
+                <?php if($frame->hasContext()): ?>
                 <div class="frame-body">
-                    <pre><code class="php"><?php echo $frame->getContext()->getSnippet(); ?></code></pre>
+                    <?php echo $frame->getContext()->getSnippet(); ?>
 
                     <p><b>Arguments</b></p>
                     <table class="table">
@@ -57,6 +68,7 @@
                         </tbody>
                     </table>
                 </div>
+                <?php endif; ?>
             </div>
             <?php endforeach; ?>
         </div>
@@ -73,7 +85,5 @@
             });
         })();
     </script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
 </body>
 </html>
