@@ -78,7 +78,11 @@ class ErrorHandler
         }
 
         foreach ($this->listeners as $listener) {
-            $listener->handle($exception);
+            try {
+                $listener->handle($exception);
+            } catch (Throwable $exceptionalException) {
+                echo $exceptionalException->getMessage().' in '.$exceptionalException->getFile().' on line '.$exceptionalException->getLine();
+            }
         }
     }
 

@@ -11,14 +11,20 @@ class WebHandler implements HandlerInterface
 
     public static function isWeb(): bool
     {
-        return \strpos($_SERVER['HTTP_CONTENT_TYPE'] ?? '', 'text/html') !== false;
+        return \strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'text/html') !== false;
     }
 
     public function handle(Throwable $e): void
     {
         \http_response_code(500);
         \header('Content-Type: text/html;charset=utf8');
-        $trace = new Stacktrace($e);
+
+        $stack = [[$e, new Stacktrace($e)]];
+
+        while ($e = $e->getPrevious()) {
+            $stack[] = [$e, new Stacktrace($e)];
+        }
+
         require __DIR__ . '/../Resources/debug.html';
     }
 }

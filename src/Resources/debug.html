@@ -1,48 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><?php echo $e->getMessage(); ?></title>
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <title>Whoops</title>
+    <link rel="stylesheet" defer href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/default.min.css">
     <style>
-        body { background: #eee; }
-        .container { background: #fff; width: 60rem; margin: 1rem auto; }
-        .column { padding: 1rem; }
+        :root { font-size: 16px; }
+        html { box-sizing: border-box; }
+        *, *:before, *:after { box-sizing: inherit; }
+        body { color: #222; background: #eee; }
+        h1, h2, h3, h4, h5, h6, p, pre, table { margin: 1rem 0; }
+        table { width: 100%; border-collapse: collapse; }
+        table td { padding: .4rem .8rem; border-bottom: 1px solid #eee; }
+        table tr:last-child td { border-bottom: none; }
+        code, pre { font-size: inherit; font-family: monospace; }
+        pre { line-height: 1.8rem; background: #F0F0F0;  }
+        pre code { padding: 0.5em; display: block; }
+        .container { width: 80rem; margin: 1rem auto; }
+        .section { background: #fff; margin: 1rem 0; padding: 1rem 2rem; }
+        .frame { border-bottom: 1px solid #eee; }
+        .frame:last-child { border-bottom: none; }
+        .frame-header { cursor: pointer; padding: 1rem .8rem; }
+        .frame-header:hover { background: #f9f9f9; }
+        .frame-body { display: none; }
+        .frame-body--open { display: block; }
+        .quiet { color: #aaa; }
+        .quiet code { color: #555; }
     </style>
 </head>
 <body>
     <div class="container">
-         <div class="columns">
-            <div class="column col-12">
-                <h3>Uncaught <?php echo get_class($e); ?></h3>
-                <p><?php echo $e->getMessage(); ?></p>
-                <p><code><?php echo $e->getFile(); ?></code> on line
-                    <code><?php echo $e->getLine(); ?></code></p>
+        <?php foreach($stack as [$e, $trace]): $frames = $trace->getFrames(); ?>
+        <div class="section">
+            <h2><?php echo get_class($e); ?></h2>
+            <p><?php echo $e->getMessage(); ?></p>
+            <p class="quiet"><code><?php echo $e->getFile(); ?></code> on line <code><?php echo $e->getLine(); ?></code></p>
 
-                <p>Context</p>
-                <?php $frames = $trace->getFrames();
-                    $first = $frames[0];
-                    $context = $first->getContext();
-                    $snippet = $context->getPlaceInFile();
-                    $pad = strlen(max(array_keys($snippet))); ?>
+            <p><b>Stacktrace</b></p>
+            <?php foreach($frames as $frame): ?>
+            <div class="frame">
+                <div class="frame-header">
+                    <span class="quiet"><code><?php echo $frame->getCaller(); ?></code> in <code><?php echo $frame->getFile(); ?></code>
+                    on line <code><?php echo $frame->getLine(); ?></code></span>
+                </div>
+                <div class="frame-body">
+                    <pre><code class="php"><?php echo $frame->getContext()->getSnippet(); ?></code></pre>
 
-<pre class="code"><code><?php foreach($snippet as $line => $code): ?>
-<?php echo str_pad($line, $pad, ' ', STR_PAD_LEFT); ?>. <?php echo $code; ?>
-<?php endforeach; ?></code></pre>
-
-                <p>Stacktrace</p>
-                <table class="table">
-                    <tbody>
-                        <?php foreach($frames as $frame): ?>
-                        <tr>
-                            <td><code><?php echo $frame->getCaller(); ?></code></td>
-                            <td>in <code><?php echo $frame->getFile(); ?></code> on line
-                                <code><?php echo $frame->getLine(); ?></code></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                    <p><b>Arguments</b></p>
+                    <table class="table">
+                        <tbody>
+                            <?php foreach($frame->getArguments() as $name => $arg): ?>
+                            <tr>
+                                <td width="20%"><code><?php echo $name; ?></code></td>
+                                <td><code><?php echo $arg; ?></code></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+            <?php endforeach; ?>
         </div>
+        <?php endforeach; ?>
     </div>
+    <script>
+        (function() {
+            const elements = document.querySelectorAll('.frame-header');
+            Array.prototype.forEach.call(elements, function(element) {
+                element.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    element.parentNode.querySelector('.frame-body').classList.toggle('frame-body--open');
+                });
+            });
+        })();
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
 </body>
 </html>

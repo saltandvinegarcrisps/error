@@ -11,17 +11,26 @@ class Context
 
     protected $line;
 
+    /**
+     * @param string
+     * @param int
+     */
     public function __construct(string $file, int $line)
     {
         $this->file = $file;
         $this->line = $line;
     }
 
+    /**
+     * @param int
+     * @param int
+     * @return array
+     */
     public function getPlaceInFile(int $linesBefore = 4, int $linesAfter = 4): array
     {
         $context = [];
 
-        $offset = $this->line - $linesBefore - 1;
+        $offset = (int) ($this->line - $linesBefore - 1);
 
         if ($offset < 0) {
             $linesBefore = 0;
@@ -38,5 +47,20 @@ class Context
         }
 
         return $context;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSnippet(): string
+    {
+        $snippet = $this->getPlaceInFile();
+        $pad = \strlen((string) \max(\array_keys($snippet)));
+
+        foreach (\array_keys($snippet) as $line) {
+            $snippet[$line] = \str_pad((string) $line, $pad, ' ', STR_PAD_LEFT).' '.$snippet[$line];
+        }
+
+        return \htmlspecialchars(\implode('', $snippet));
     }
 }

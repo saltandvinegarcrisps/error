@@ -15,6 +15,11 @@ class ConsoleHandler implements HandlerInterface
 
     public function handle(Throwable $e): void
     {
-        echo $this->getMessage($e).PHP_EOL;
+        $handle = \fopen('php://stderr', 'a');
+        if (!\is_resource($handle)) {
+            throw new \ErrorException('Failed to open php://stderr stream');
+        }
+        \fwrite($handle, $this->getMessage($e).PHP_EOL);
+        \fclose($handle);
     }
 }

@@ -11,13 +11,18 @@ class JsonHandler implements HandlerInterface
 
     public static function isJson(): bool
     {
-        return \strpos($_SERVER['HTTP_CONTENT_TYPE'] ?? '', 'application/json') !== false;
+        return \strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest';
     }
 
     public function handle(Throwable $e): void
     {
         $id = \sha1($this->getMessage($e));
-        $trace = new Stacktrace($e);
+
+        $stack = [[$e, new Stacktrace($e)]];
+
+        while ($e = $e->getPrevious()) {
+            $stack[] = [$e, new Stacktrace($e)];
+        }
 
         \http_response_code(500);
         echo \json_encode([
@@ -26,9 +31,9 @@ class JsonHandler implements HandlerInterface
                 'self' => $_SERVER['REQUEST_URI'] ?? '/',
             ],
             'status' => 500,
-            'code' => $e->getCode(),
-            'title' => $this->getMessage($e),
-            'detail' => $trace->getFrames(),
+            'code' => $stack[0][0]->getCode(),
+            'title' => $this->getMessage($stack[0][0]),
+            'detail' => $stack,
         ], JSON_PRETTY_PRINT);
     }
 }

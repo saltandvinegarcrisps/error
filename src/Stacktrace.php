@@ -19,21 +19,19 @@ class Stacktrace
         $this->exception = $exception;
     }
 
-    /**
-     * @return array
-     */
     protected function getTrace(): array
     {
-        $frames = $this->exception->getTrace();
+        $trace = $this->exception->getTrace();
 
-        // if (!isset($frames[0]['file']) || $frames[0]['file'] !== $this->exception->getFile()) {
-        //     \array_unshift($frames, [
-        //         'file' => $this->exception->getFile(),
-        //         'line' => $this->exception->getLine(),
-        //     ]);
-        // }
+        if (empty($trace)) {
+            return [[
+                'file' => $this->exception->getFile(),
+                'line' => $this->exception->getLine(),
+                'function' => '{main}',
+            ]];
+        }
 
-        return $frames;
+        return $trace;
     }
 
     /**

@@ -4,10 +4,32 @@ require __DIR__ . '/vendor/autoload.php';
 
 $error = new \Error\ErrorHandler;
 
-// $error->attach(new \Error\Handler\ConsoleHandler);
-// $error->attach(new \Error\Handler\JsonHandler);
-$error->attach(new \Error\Handler\WebHandler);
+if (\Error\Handler\ConsoleHandler::isConsole()) {
+    $error->attach(new \Error\Handler\ConsoleHandler);
+}
+
+if (\Error\Handler\JsonHandler::isJson()) {
+    $error->attach(new \Error\Handler\JsonHandler);
+}
+
+if (\Error\Handler\WebHandler::isWeb()) {
+    $error->attach(new \Error\Handler\WebHandler);
+}
+
 $error->register();
 
-$f = new Symfony\Component\Filesystem\Filesystem();
-$f->touch('/usr/lib/foo');
+function foo($msg)
+{
+    try {
+        bar($msg);
+    } catch (Exception $e) {
+        throw new Exception('Fail failed', 0, $e);
+    }
+}
+
+function bar($msg)
+{
+    (new Symfony\Component\Filesystem\Filesystem)->touch('/root/'.$msg);
+}
+
+foo('Test');
