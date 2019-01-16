@@ -3,19 +3,7 @@
 require __DIR__ . '/vendor/autoload.php';
 
 $error = new \Error\ErrorHandler;
-
-if (\Error\Handler\ConsoleHandler::isConsole()) {
-    $error->attach(new \Error\Handler\ConsoleHandler);
-}
-
-if (\Error\Handler\JsonHandler::isJson()) {
-    $error->attach(new \Error\Handler\JsonHandler);
-}
-
-if (\Error\Handler\WebHandler::isWeb()) {
-    $error->attach(new \Error\Handler\WebHandler);
-}
-
+$error->attach(new \Error\Handler\WebHandler(true));
 $error->register();
 
 function foo($msg)
