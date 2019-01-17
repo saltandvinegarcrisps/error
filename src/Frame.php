@@ -100,14 +100,16 @@ class Frame implements JsonSerializable
             return [];
         }
 
-        if (\in_array($caller, ['{closure}', '{main}'])) {
-            return [];
-        }
-
         if (\strpos($caller, '->') || \strpos($caller, '::')) {
             [$class, $method] = \explode(' ', \str_replace(['->', '::'], ' ', $caller));
+            if (\in_array($method, ['{closure}', '{main}'])) {
+                return [];
+            }
             $func = (new \ReflectionClass($class))->getMethod($method);
         } else {
+            if (\in_array($caller, ['{closure}', '{main}'])) {
+                return [];
+            }
             $func = (new \ReflectionFunction($caller));
         }
 
