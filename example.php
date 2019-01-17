@@ -6,23 +6,25 @@ $error = new \Error\ErrorHandler;
 $error->attach(new \Error\Handler\WebHandler(1));
 $error->register();
 
-function foo($msg)
+function createProject(...$files)
 {
-    try {
-        bar($msg);
-    } catch (Exception $e) {
-        throw new Exception('Fail failed', 0, $e);
+    foreach ($files as $filename) {
+        try {
+            createFile($filename);
+        } catch (Exception $e) {
+            throw new Exception('Failed', $e->getCode(), $e);
+        }
     }
 }
 
-function bar($msg)
+function createFile($filename)
 {
-    (new Symfony\Component\Filesystem\Filesystem)->touch('/root/'.$msg);
+    (new Symfony\Component\Filesystem\Filesystem)->touch('/this/should/fail/'.$filename);
 }
 
-function baz()
+function setupProject()
 {
-    foo('Test');
+    createProject('readme.md', 'composer.json', 'package.json');
 }
 
-baz();
+setupProject();

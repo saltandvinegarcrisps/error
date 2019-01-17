@@ -93,10 +93,27 @@ class Frame implements JsonSerializable
 
     public function setArguments(array $args): void
     {
+        $params = [];
+
+        if ($caller = $this->getCaller()) {
+            if (\strpos($caller, '->') !== false) {
+                [$class, $method] = \explode('->', $caller);
+                $func = (new \ReflectionClass($class))->getMethod($method);
+            } else {
+                $func = (new \ReflectionFunction($caller));
+            }
+
+            if (!$func->isVariadic()) {
+                $params = $func->getParameters();
+            }
+        }
+
         $this->args = [];
 
         foreach (\array_values($args) as $index => $arg) {
-            $this->args['param'.($index + 1)] = $this->normalise($arg);
+            $name = \array_key_exists($index, $params) ?
+                $params[$index]->getName() : 'param'.($index+1);
+            $this->args[$name] = $this->normalise($arg);
         }
     }
 
