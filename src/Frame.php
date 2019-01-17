@@ -91,28 +91,41 @@ class Frame implements JsonSerializable
         return $this->args ?: [];
     }
 
-    public function setArguments(array $args): void
+    protected function getParams(): array
     {
         $params = [];
+        $caller = $this->getCaller();
 
-        if ($caller = $this->getCaller()) {
-            if (\strpos($caller, '->') !== false) {
-                [$class, $method] = \explode('->', $caller);
-                $func = (new \ReflectionClass($class))->getMethod($method);
-            } else {
-                $func = (new \ReflectionFunction($caller));
-            }
-
-            if (!$func->isVariadic()) {
-                $params = $func->getParameters();
-            }
+        if (empty($caller)) {
+            return [];
         }
 
+        if (\in_array($caller, ['{closure}', '{main}'])) {
+            return [];
+        }
+
+        if (\strpos($caller, '->') || \strpos($caller, '::')) {
+            [$class, $method] = \explode(' ', \str_replace(['->', '::'], ' ', $caller));
+            $func = (new \ReflectionClass($class))->getMethod($method);
+        } else {
+            $func = (new \ReflectionFunction($caller));
+        }
+
+        if (!$func->isVariadic()) {
+            $params = $func->getParameters();
+        }
+
+        return $params;
+    }
+
+    public function setArguments(array $args): void
+    {
+        $paramNames = $this->getParams();
         $this->args = [];
 
         foreach (\array_values($args) as $index => $arg) {
-            $name = \array_key_exists($index, $params) ?
-                $params[$index]->getName() : 'param'.($index+1);
+            $name = \array_key_exists($index, $paramNames) ?
+                $paramNames[$index]->getName() : 'param'.($index+1);
             $this->args[$name] = $this->normalise($arg);
         }
     }

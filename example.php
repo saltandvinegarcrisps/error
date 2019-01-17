@@ -6,6 +6,19 @@ $error = new \Error\ErrorHandler;
 $error->attach(new \Error\Handler\WebHandler(1));
 $error->register();
 
+class Project
+{
+    public static function has($filename): bool
+    {
+        return is_file('/this/should/fail/'.$filename);
+    }
+
+    public static function create($filename)
+    {
+        (new Symfony\Component\Filesystem\Filesystem)->touch('/this/should/fail/'.$filename);
+    }
+}
+
 function createProject(...$files)
 {
     foreach ($files as $filename) {
@@ -19,12 +32,14 @@ function createProject(...$files)
 
 function createFile($filename)
 {
-    (new Symfony\Component\Filesystem\Filesystem)->touch('/this/should/fail/'.$filename);
+    Project::create($filename);
 }
 
 function setupProject()
 {
-    createProject('readme.md', 'composer.json', 'package.json');
+    return function ($extra) {
+        createProject('readme.md', 'composer.json', 'package.json');
+    };
 }
 
-setupProject();
+setupProject()('test');
