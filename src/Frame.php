@@ -91,26 +91,33 @@ class Frame implements JsonSerializable
         return $this->args ?: [];
     }
 
+    public function hasArgument(): bool
+    {
+        return !empty($this->args);
+    }
+
     protected function getParams(): array
     {
         $params = [];
         $caller = $this->getCaller();
 
         if (empty($caller)) {
-            return [];
+            return $params;
         }
 
         if (\strpos($caller, '->') || \strpos($caller, '::')) {
             [$class, $method] = \explode(' ', \str_replace(['->', '::'], ' ', $caller));
-            if (\in_array($method, ['{closure}', '{main}'])) {
-                return [];
+            try {
+                $func = (new \ReflectionClass($class))->getMethod($method);
+            } catch (\ReflectionException  $e) {
+                return $params;
             }
-            $func = (new \ReflectionClass($class))->getMethod($method);
         } else {
-            if (\in_array($caller, ['{closure}', '{main}'])) {
-                return [];
+            try {
+                $func = (new \ReflectionFunction($caller));
+            } catch (\ReflectionException  $e) {
+                return $params;
             }
-            $func = (new \ReflectionFunction($caller));
         }
 
         if (!$func->isVariadic()) {

@@ -29,11 +29,13 @@
                         <?php endif; ?>
                     </span>
                 </div>
-                <?php if($frame->hasContext()): ?>
+                <?php if($frame->hasContext() || $frame->hasArgument()): ?>
                 <div class="frame-body">
+                    <?php if($frame->hasContext()): ?>
                     <?php echo $frame->getContext()->getSnippet(); ?>
+                    <?php endif; ?>
 
-                    <?php if(count($frame->getArguments())): ?>
+                    <?php if($frame->hasArgument()): ?>
                     <p><b>Arguments</b></p>
                     <table class="table">
                         <tbody>
