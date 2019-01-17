@@ -65,9 +65,9 @@ class Context
             if ($this->line == $line) {
                 $class[] = 'highlight';
             }
-            $className = implode(' ', $class);
+            $className = \implode(' ', $class);
 
-            $block .= sprintf(
+            $block .= \sprintf(
                 '<span class="%s"><span class="line-number">%s</span> %s</span>',
                 $className,
                 $line,

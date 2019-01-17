@@ -1,34 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Internal Server Error</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        :root { font-size: 16px; line-height: 24px; }
-        html { box-sizing: border-box; }
-        *, *:before, *:after { box-sizing: inherit; }
-        body { color: #000d47; background: #eee; }
-        h1, h2, h3, h4, h5, h6, p, pre, table { margin: 1rem 0; }
-        table { width: 100%; border-collapse: collapse; }
-        table td { padding: .4rem .8rem; border-bottom: 1px solid #eee; }
-        table tr:last-child td { border-bottom: none; }
-
-        .block { margin: 1rem 0; display: block; line-height: 2rem; font-family: monospace; }
-        .block .line { background: #eee; display: block; font-family: monospace; white-space: pre; display: block; }
-        .block .line-number { line-height: 2rem; display: inline-block; background: #ddd; padding: 0 .4rem 0 .8rem; }
-
-        .block .highlight { background: #ccc; }
-        .block .highlight .line-number { background: #aaa; }
-
-        .container { width: 80rem; margin: 1rem auto; }
-        .section { background: #fff; margin: 1rem 0; padding: 1rem 2rem; }
-        .frame { border-bottom: 1px solid #eee; }
-        .frame:last-child { border-bottom: none; }
-        .frame-header { cursor: pointer; padding: 1rem .8rem; }
-        .frame-header:hover { background: #f9f9f9; }
-        .frame-body { display: none; }
-        .frame-body--open { display: block; }
-        .quiet { color: #aaa; }
-        .quiet code { color: #555; }
+        <?php echo file_get_contents(__DIR__ . '/styles.css'); ?>
     </style>
 </head>
 <body>
@@ -80,6 +57,7 @@
             Array.prototype.forEach.call(elements, function(element) {
                 element.addEventListener('click', function(event) {
                     event.preventDefault();
+                    element.classList.toggle('frame-header--open');
                     element.parentNode.querySelector('.frame-body').classList.toggle('frame-body--open');
                 });
             });

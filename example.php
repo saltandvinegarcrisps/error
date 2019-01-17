@@ -3,7 +3,7 @@
 require __DIR__ . '/vendor/autoload.php';
 
 $error = new \Error\ErrorHandler;
-$error->attach(new \Error\Handler\WebHandler(true));
+$error->attach(new \Error\Handler\WebHandler(1));
 $error->register();
 
 function foo($msg)

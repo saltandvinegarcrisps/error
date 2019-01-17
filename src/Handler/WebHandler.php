@@ -2,7 +2,6 @@
 
 namespace Error\Handler;
 
-use Error\Context;
 use Error\Stacktrace;
 use Throwable;
 
