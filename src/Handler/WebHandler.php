@@ -11,24 +11,40 @@ class WebHandler implements HandlerInterface
 
     protected $debug;
 
+    protected $resources;
+
     public function __construct(bool $debug = false)
     {
         $this->debug = $debug;
+        $this->resources = \dirname(__DIR__) . '/Resources';
     }
 
-    public function handle(Throwable $e): void
+    protected function getStack(Throwable $e): array
     {
-        \http_response_code(500);
-        \header('Content-Type: text/html;charset=utf8');
-
         $stack = [[$e, new Stacktrace($e)]];
 
         while ($e = $e->getPrevious()) {
             $stack[] = [$e, new Stacktrace($e)];
         }
 
-        $file = __DIR__ . '/../Resources/'.($this->debug ? 'debug' : 'message').'.html';
+        return $stack;
+    }
 
-        require $file;
+    protected function render(Throwable $e): string
+    {
+        \ob_start();
+
+        $stack = $this->getStack($e);
+
+        require $this->resources.'/'.($this->debug ? 'debug' : 'message').'.html';
+
+        return \ob_get_clean() ?: '';
+    }
+
+    public function handle(Throwable $e): void
+    {
+        \http_response_code(500);
+        \header('Content-Type: text/html;charset=utf8');
+        echo $this->render($e);
     }
 }

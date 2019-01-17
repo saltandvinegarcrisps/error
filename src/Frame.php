@@ -104,7 +104,7 @@ class Frame implements JsonSerializable
     {
         $count = \count($value);
 
-        if ($count > 100) {
+        if ($count < 1 || $count > 100) {
             return 'Array of length ' . $count;
         }
 

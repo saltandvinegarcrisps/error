@@ -20,4 +20,9 @@ function bar($msg)
     (new Symfony\Component\Filesystem\Filesystem)->touch('/root/'.$msg);
 }
 
-foo('Test');
+function baz()
+{
+    foo('Test');
+}
+
+baz();

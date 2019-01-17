@@ -33,6 +33,7 @@
                 <div class="frame-body">
                     <?php echo $frame->getContext()->getSnippet(); ?>
 
+                    <?php if(count($frame->getArguments())): ?>
                     <p><b>Arguments</b></p>
                     <table class="table">
                         <tbody>
@@ -44,6 +45,7 @@
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    <?php endif; ?>
                 </div>
                 <?php endif; ?>
             </div>
@@ -53,13 +55,22 @@
     </div>
     <script>
         (function() {
+            const toggle = function(event) {
+                let header = event.target;
+                while(!header.classList.contains('frame-header')) {
+                    header = header.parentNode;
+                }
+                let frame = header.parentNode,
+                    body = frame.querySelector('.frame-body');
+                if(body) {
+                    event.preventDefault();
+                    header.classList.toggle('frame-header--open');
+                    body.classList.toggle('frame-body--open');
+                }
+            };
             const elements = document.querySelectorAll('.frame-header');
             Array.prototype.forEach.call(elements, function(element) {
-                element.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    element.classList.toggle('frame-header--open');
-                    element.parentNode.querySelector('.frame-body').classList.toggle('frame-body--open');
-                });
+                element.addEventListener('click', toggle);
             });
         })();
     </script>
