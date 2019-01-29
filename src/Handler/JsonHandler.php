@@ -2,24 +2,19 @@
 
 namespace Error\Handler;
 
-use Error\Stacktrace;
 use Throwable;
 
 class JsonHandler implements HandlerInterface
 {
-    use ExceptionMessageTrait;
+    use ExceptionMessageTrait, ExceptionStackTrait;
 
     public function handle(Throwable $e): void
     {
         $id = \sha1($this->getMessage($e));
 
-        $stack = [[$e, new Stacktrace($e)]];
+        $stack = $this->getStack($e);
 
-        while ($e = $e->getPrevious()) {
-            $stack[] = [$e, new Stacktrace($e)];
-        }
-
-        \http_response_code(500);
+        \header('Content-Type: application/json', true, 500);
         echo \json_encode([
             'id' => $id,
             'links' => [

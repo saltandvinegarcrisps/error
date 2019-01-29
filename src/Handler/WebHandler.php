@@ -2,12 +2,11 @@
 
 namespace Error\Handler;
 
-use Error\Stacktrace;
 use Throwable;
 
 class WebHandler implements HandlerInterface
 {
-    use ExceptionMessageTrait;
+    use ExceptionMessageTrait, ExceptionStackTrait;
 
     protected $debug;
 
@@ -17,17 +16,6 @@ class WebHandler implements HandlerInterface
     {
         $this->debug = $debug;
         $this->resources = \dirname(__DIR__) . '/Resources';
-    }
-
-    protected function getStack(Throwable $e): array
-    {
-        $stack = [[$e, new Stacktrace($e)]];
-
-        while ($e = $e->getPrevious()) {
-            $stack[] = [$e, new Stacktrace($e)];
-        }
-
-        return $stack;
     }
 
     protected function render(Throwable $e): string
@@ -43,8 +31,7 @@ class WebHandler implements HandlerInterface
 
     public function handle(Throwable $e): void
     {
-        \http_response_code(500);
-        \header('Content-Type: text/html;charset=utf8');
+        \header('Content-Type: text/html', true, 500);
         echo $this->render($e);
     }
 }
