@@ -94,13 +94,7 @@ class ErrorHandler
     public function onShutdown(): void
     {
         if ($error = \error_get_last()) {
-            throw new ErrorException(
-                $error['message'],
-                0,
-                $error['type'],
-                $error['file'],
-                $error['line']
-            );
+            $this->onError($error['type'], $error['message'], $error['file'], $error['line']);
         }
     }
 }

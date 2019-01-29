@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class ErrorHandlerTest extends TestCase
 {
-    public function testAttach()
+    public function testAttach(): void
     {
         $listeners = new \SplObjectStorage;
         $error = new \Error\ErrorHandler($listeners);
