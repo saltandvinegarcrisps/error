@@ -10,6 +10,12 @@ class ErrorHandler
 {
     protected $listeners;
 
+    protected $previousErrorHandler;
+
+    protected $previousExceptionHandler;
+
+    private $reservedMemory;
+
     public function __construct(SplObjectStorage $listeners = null)
     {
         $this->listeners = $listeners ?: new SplObjectStorage;
@@ -18,12 +24,14 @@ class ErrorHandler
     /**
      * Register callback for handling errors
      *
+     * @param int $reservedMemorySize Size in KBs
      * @return void
      */
-    public function register(): void
+    public function register(int $reservedMemorySize = 10): void
     {
-        \set_error_handler([$this, 'onError']);
-        \set_exception_handler([$this, 'onUncaughtException']);
+        $this->reservedMemory = \str_repeat('x', 1024 * $reservedMemorySize);
+        $this->previousErrorHandler = \set_error_handler([$this, 'onError']);
+        $this->previousExceptionHandler = \set_exception_handler([$this, 'onUncaughtException']);
         \register_shutdown_function([$this, 'onShutdown']);
     }
 
@@ -58,11 +66,18 @@ class ErrorHandler
      * @param int
      * @return void
      */
-    public function onError(int $level, string $message, string $file, int $line): void
+    public function onError(int $level, string $message, string $file, int $line): bool
     {
         if (\error_reporting() & $level) {
-            throw new ErrorException($message, 0, $level, $file, $line);
+            $exception = new ErrorException($message, 0, $level, $file, $line);
+            $this->onUncaughtException($exception);
         }
+
+        if ($this->previousErrorHandler) {
+            $this->previousErrorHandler($level, $message, $file, $line);
+        }
+
+        return true;
     }
 
     /**
@@ -81,8 +96,12 @@ class ErrorHandler
             try {
                 $listener->handle($exception);
             } catch (Throwable $exceptionalException) {
-                echo $exceptionalException->getMessage().' in '.$exceptionalException->getFile().' on line '.$exceptionalException->getLine();
+                echo $exceptionalException;
             }
+        }
+
+        if ($this->previousExceptionHandler) {
+            $this->previousExceptionHandler($exception);
         }
     }
 
@@ -94,6 +113,7 @@ class ErrorHandler
     public function onShutdown(): void
     {
         if ($error = \error_get_last()) {
+            $this->reservedMemory = null;
             $this->onError($error['type'], $error['message'], $error['file'], $error['line']);
         }
     }

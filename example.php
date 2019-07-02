@@ -1,9 +1,18 @@
 <?php
 
+ini_set('memory_limit', 1024 * 1024 * 10);
+error_reporting(-1);
+
 require __DIR__ . '/vendor/autoload.php';
 
 $error = new \Error\ErrorHandler;
-$error->attach(new \Error\Handler\WebHandler(1));
+
+if ('cli' === php_sapi_name()) {
+    $error->attach(new \Error\Handler\ConsoleHandler);
+} else {
+    $error->attach(new \Error\Handler\WebHandler($debug = true));
+}
+
 $error->register();
 
 class Project
