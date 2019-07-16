@@ -10,7 +10,8 @@ class ConsoleHandler implements HandlerInterface
 
     protected function write(string $msg): void
     {
-        \fwrite(STDERR, $msg);
+        $stream = \fopen('php://stderr', 'wb');
+        \fwrite($stream, $msg);
     }
 
     protected function writeln(string $msg): void
