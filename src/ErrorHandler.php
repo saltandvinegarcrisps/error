@@ -17,6 +17,24 @@ class ErrorHandler
 
     private $reservedMemory;
 
+    private const ERRORS = [
+        E_ERROR => 'Error',
+        E_WARNING => 'Warning',
+        E_PARSE => 'Parse',
+        E_NOTICE => 'Notice',
+        E_CORE_ERROR => 'Core Error',
+        E_CORE_WARNING => 'Core Warning',
+        E_COMPILE_ERROR => 'Compile Error',
+        E_COMPILE_WARNING => 'Compile Warning',
+        E_USER_ERROR => 'User Error',
+        E_USER_WARNING => 'User Warning',
+        E_USER_NOTICE => 'User Notice',
+        E_RECOVERABLE_ERROR => 'Recoverable Error',
+        E_DEPRECATED => 'Deprecated',
+        E_USER_DEPRECATED => 'User Deprecated',
+        E_STRICT => 'Strict',
+    ];
+
     public function __construct(SplObjectStorage $listeners = null)
     {
         $this->listeners = $listeners ?: new SplObjectStorage;
@@ -70,12 +88,11 @@ class ErrorHandler
     public function onError(int $level, string $message, string $file, int $line): bool
     {
         if (\error_reporting() & $level) {
-            $exception = new ErrorException($message, 0, $level, $file, $line);
-            $this->onUncaughtException($exception);
+            throw new ErrorException($message, 0, $level, $file, $line);
         }
 
         if (\is_callable($this->previousErrorHandler)) {
-            (new ReflectionFunction($this->previousErrorHandler))->invoke($level, $message, $file, $line);
+            return (new ReflectionFunction($this->previousErrorHandler))->invoke($level, $message, $file, $line);
         }
 
         return true;
@@ -115,7 +132,7 @@ class ErrorHandler
     {
         if ($error = \error_get_last()) {
             $this->reservedMemory = null;
-            $this->onError($error['type'], $error['message'], $error['file'], $error['line']);
+            $this->onError($error['type'], self::ERRORS[$error['type']] . ': ' . $error['message'], $error['file'], $error['line']);
         }
     }
 }
