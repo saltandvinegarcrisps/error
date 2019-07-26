@@ -3,6 +3,7 @@
 namespace Error;
 
 use ErrorException;
+use ReflectionFunction;
 use SplObjectStorage;
 use Throwable;
 
@@ -73,8 +74,8 @@ class ErrorHandler
             $this->onUncaughtException($exception);
         }
 
-        if ($this->previousErrorHandler) {
-            $this->previousErrorHandler($level, $message, $file, $line);
+        if (\is_callable($this->previousExceptionHandler)) {
+            (new ReflectionFunction($this->previousExceptionHandler))->invoke($level, $message, $file, $line);
         }
 
         return true;
