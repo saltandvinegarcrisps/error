@@ -74,8 +74,8 @@ class ErrorHandler
             $this->onUncaughtException($exception);
         }
 
-        if (\is_callable($this->previousExceptionHandler)) {
-            (new ReflectionFunction($this->previousExceptionHandler))->invoke($level, $message, $file, $line);
+        if (\is_callable($this->previousErrorHandler)) {
+            (new ReflectionFunction($this->previousErrorHandler))->invoke($level, $message, $file, $line);
         }
 
         return true;
@@ -101,8 +101,8 @@ class ErrorHandler
             }
         }
 
-        if ($this->previousExceptionHandler) {
-            $this->previousExceptionHandler($exception);
+        if (\is_callable($this->previousExceptionHandler)) {
+            (new ReflectionFunction($this->previousExceptionHandler))->invoke($exception);
         }
     }
 
