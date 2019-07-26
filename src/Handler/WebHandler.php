@@ -31,7 +31,9 @@ class WebHandler implements HandlerInterface
 
     public function handle(Throwable $e): void
     {
-        \header('Content-Type: text/html', true, 500);
+        if (!\headers_sent()) {
+            \header('Content-Type: text/html', true, 500);
+        }
         echo $this->render($e);
     }
 }
