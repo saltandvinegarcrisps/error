@@ -35,7 +35,7 @@ class ConsoleHandler implements HandlerInterface
                 $this->writeln('');
                 $lines = $frame->getContext()->getPlaceInFile();
                 foreach ($lines as $num => $line) {
-                    $this->writeln('        '.$num.' '.$line);
+                    $this->writeln('        '.$num.' '.rtrim($line));
                 }
                 $this->writeln('');
                 break;
