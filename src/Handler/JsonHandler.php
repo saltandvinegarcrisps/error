@@ -3,35 +3,44 @@
 namespace Error\Handler;
 
 use Throwable;
+use Error\Frame;
 
 class JsonHandler implements HandlerInterface
 {
     use ExceptionMessageTrait, ExceptionStackTrait;
 
-    public function handle(Throwable $e): void
+    public function getData(Throwable $e): array
     {
-        $id = \sha1($this->getMessage($e));
+        $id = \sha1($e->getMessage());
 
-        $stack = $this->getStack($e);
-        [$exception, $trace] = reset($stack);
-
-        if (!\headers_sent()) {
-            \header('Content-Type: application/json', true, 500);
+        $source = [];
+        foreach ($this->getStack($e) as [$exception, $stacktrace]) {
+            $source[] = [
+                'exception' => \get_class($exception).': '.$exception->getMessage(),
+                'trace' => \array_map(function (Frame $frame) {
+                    return $frame->toString();
+                }, $stacktrace->getFrames()),
+            ];
         }
-        echo \json_encode([
+
+        return [
             'id' => $id,
             'links' => [
                 'self' => $_SERVER['REQUEST_URI'] ?? '/',
             ],
             'status' => 500,
-            'code' => $exception->getCode(),
-            'title' => \sprintf('Uncaught %s', get_class($exception)),
-            'detail' => $exception->getMessage(),
-            'source' => \array_map(function ($frame) {
-                return $frame->getFile().':'.$frame->getLine();
-            }, \array_filter($trace->getFrames(), function ($frame) {
-                return $frame->hasFile() && $frame->hasLine();
-            })),
-        ], JSON_PRETTY_PRINT);
+            'code' => $e->getCode(),
+            'title' => \sprintf('Uncaught %s', get_class($e)),
+            'detail' => $e->getMessage(),
+            'source' => $source,
+        ];
+    }
+
+    public function handle(Throwable $e): void
+    {
+        if (!\headers_sent()) {
+            \header('Content-Type: application/json', true, 500);
+        }
+        echo \json_encode($this->getData($e), JSON_PRETTY_PRINT);
     }
 }

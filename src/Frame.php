@@ -143,7 +143,11 @@ class Frame implements JsonSerializable
     {
         $count = \count($value);
 
-        if ($count < 1 || $count > 100) {
+        if ($count === 0) {
+            return 'Empty Array';
+        }
+
+        if ($count > 100) {
             return 'Array of length ' . $count;
         }
 
@@ -186,8 +190,7 @@ class Frame implements JsonSerializable
             return $this->normaliseArray($value);
         }
 
-        $truncation = new Truncation($value);
-        return $truncation->truncate();
+        return (new Truncation($value))->truncate();
     }
 
     public function hasContext(): bool
@@ -198,6 +201,14 @@ class Frame implements JsonSerializable
     public function getContext(): Context
     {
         return new Context($this->getFile(), $this->getLine());
+    }
+
+    public function toString(): string
+    {
+        if ($this->hasContext()) {
+            return $this->getFile().':'.$this->getLine();
+        }
+        return $this->getCaller();
     }
 
     public function toArray(): array
