@@ -27,19 +27,27 @@ class ConsoleHandler implements HandlerInterface
             $this->writeln(\get_class($exception));
             $this->writeln($exception->getMessage());
             $this->writeln('');
-            foreach ($trace->getFrames() as $frame) {
+            foreach ($trace->getFrames() as $index => $frame) {
                 if (!$frame->hasFile()) {
                     continue;
                 }
                 $this->writeln('    '.$frame->getFile().':'.$frame->getLine());
-                $this->writeln('');
-                $lines = $frame->getContext()->getPlaceInFile();
-                foreach ($lines as $num => $line) {
-                    $this->writeln('        '.$num.' '.rtrim($line));
+                if ($index === 0) {
+                    $this->writeln('');
+                    $lines = $frame->getContext()->getPlaceInFile();
+                    foreach ($lines as $num => $line) {
+                        $this->writeln('        '.$num.' '.rtrim($line));
+                    }
+                    $this->writeln('');
                 }
-                $this->writeln('');
-                break;
+                if ($frame->hasArgument()) {
+                    foreach ($frame->getArguments() as $key => $value) {
+                        $this->writeln('        '.$key.' '.rtrim($value));
+                    }
+                    $this->writeln('');
+                }
             }
         }
+        $this->writeln('');
     }
 }
