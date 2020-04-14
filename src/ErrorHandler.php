@@ -23,7 +23,7 @@ class ErrorHandler
      */
     protected $reservedMemory;
 
-    public function __construct(?SplObjectStorage $listeners)
+    public function __construct(?SplObjectStorage $listeners = null)
     {
         $this->listeners = $listeners ?? new SplObjectStorage();
     }
