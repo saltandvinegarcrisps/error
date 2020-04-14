@@ -8,16 +8,34 @@ use Throwable;
 
 class ErrorHandler
 {
-    protected $fatalErrors;
+    /**
+     * @var int
+     */
+    protected $fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
 
+    /**
+     * @var SplObjectStorage
+     */
     protected $listeners;
 
+    /**
+     * @var string
+     */
     protected $reservedMemory;
 
-    public function __construct(SplObjectStorage $listeners = null)
+    public function __construct(?SplObjectStorage $listeners)
     {
-        $this->fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
-        $this->listeners = $listeners ?: new SplObjectStorage;
+        $this->listeners = $listeners ?? new SplObjectStorage();
+    }
+
+    /**
+     * Set fatal errors
+     *
+     * @param int $fatalErrors
+     */
+    public function setFatalErrors(int $fatalErrors): void
+    {
+        $this->fatalErrors = $fatalErrors;
     }
 
     /**
