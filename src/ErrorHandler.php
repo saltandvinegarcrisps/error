@@ -118,16 +118,16 @@ class ErrorHandler
     public function onException(Throwable $exception): void
     {
         if (!$this->listeners->count()) {
-            $this->attach(new Handler\EchoHandler);
+            $this->attach(new Handler\EchoHandler());
         }
 
-        foreach ($this->listeners as $listener) {
-            try {
+        try {
+            foreach ($this->listeners as $listener) {
                 $listener->handle($exception);
-            } catch (Throwable $exceptionalException) {
-                restore_exception_handler();
-                throw $exceptionalException;
             }
+        } catch (Throwable $exceptionalException) {
+            restore_exception_handler();
+            throw $exceptionalException;
         }
     }
 

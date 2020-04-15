@@ -19,16 +19,13 @@ class PsrHandler implements HandlerInterface
 
     public function handle(Throwable $e): void
     {
+        $severity = E_USER_ERROR;
+
         if ($e instanceof \ErrorException) {
-            $this->handleErrorException($e);
-            return;
+            $severity = $e->getSeverity();
         }
 
-        $this->logger->error($this->getMessage($e), ['exception' => $e]);
-    }
-
-    protected function handleErrorException(\ErrorException $e) {
-        switch ($e->getSeverity()) {
+        switch ($severity) {
             case E_ERROR:
             case E_RECOVERABLE_ERROR:
             case E_CORE_ERROR:
