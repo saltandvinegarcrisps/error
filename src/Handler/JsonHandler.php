@@ -2,8 +2,8 @@
 
 namespace Error\Handler;
 
-use Throwable;
 use Error\Frame;
+use Throwable;
 
 class JsonHandler implements HandlerInterface
 {
@@ -14,12 +14,12 @@ class JsonHandler implements HandlerInterface
         $id = \sha1($e->getMessage());
 
         $source = [];
-        foreach ($this->getStack($e) as [$exception, $stacktrace]) {
+        foreach ($this->getStack($e) as $trace) {
             $source[] = [
-                'exception' => \get_class($exception).': '.$exception->getMessage(),
+                'exception' => \get_class($trace->getException()).': '.$trace->getException()->getMessage(),
                 'trace' => \array_map(function (Frame $frame) {
                     return $frame->toString();
-                }, $stacktrace->getFrames()),
+                }, $trace->getFrames()),
             ];
         }
 

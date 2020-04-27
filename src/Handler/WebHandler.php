@@ -15,7 +15,7 @@ class WebHandler implements HandlerInterface
     public function __construct(bool $debug = false)
     {
         $this->debug = $debug;
-        $this->resources = \dirname(__DIR__) . '/Resources';
+        $this->resources = __DIR__ . '/../../resources';
     }
 
     protected function render(Throwable $e): string
@@ -24,7 +24,7 @@ class WebHandler implements HandlerInterface
 
         $stack = $this->getStack($e);
 
-        require $this->resources.'/'.($this->debug ? 'debug' : 'message').'.html';
+        require $this->resources.'/'.($this->debug ? 'debug' : 'message').'.php';
 
         return \ob_get_clean() ?: '';
     }

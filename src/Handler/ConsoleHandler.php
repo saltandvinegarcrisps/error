@@ -23,9 +23,9 @@ class ConsoleHandler implements HandlerInterface
     {
         $stack = $this->getStack($e);
         $this->writeln('');
-        foreach ($stack as [$exception, $trace]) {
-            $this->writeln(\get_class($exception));
-            $this->writeln($exception->getMessage());
+        foreach ($stack as $trace) {
+            $this->writeln(\get_class($trace->getException()));
+            $this->writeln($trace->getException()->getMessage());
             $this->writeln('');
             foreach ($trace->getFrames() as $index => $frame) {
                 if (!$frame->hasFile()) {
@@ -36,7 +36,11 @@ class ConsoleHandler implements HandlerInterface
                     $this->writeln('');
                     $lines = $frame->getContext()->getPlaceInFile();
                     foreach ($lines as $num => $line) {
-                        $this->writeln('        '.$num.' '.rtrim($line));
+                        if ($num === $frame->getLine()) {
+                            $this->writeln('    --> '.$num.' '.rtrim($line));
+                        } else {
+                            $this->writeln('        '.$num.' '.rtrim($line));
+                        }
                     }
                     $this->writeln('');
                 }

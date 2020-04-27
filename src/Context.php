@@ -48,35 +48,4 @@ class Context
 
         return $context;
     }
-
-    /**
-     * @return string
-     */
-    public function getSnippet(): string
-    {
-        $lines = $this->getPlaceInFile();
-        $pad = \strlen((string) \max(\array_keys($lines)));
-        $block = '<div class="block">';
-
-        foreach ($lines as $line => $code) {
-            $line = \str_pad((string) $line, $pad, ' ', STR_PAD_LEFT);
-
-            $class = ['line'];
-            if ($this->line == $line) {
-                $class[] = 'highlight';
-            }
-            $className = \implode(' ', $class);
-
-            $block .= \sprintf(
-                '<span class="%s"><span class="line-number">%s</span> %s</span>',
-                $className,
-                $line,
-                \htmlspecialchars($code)
-            );
-        }
-
-        $block .= '</div>';
-
-        return $block;
-    }
 }

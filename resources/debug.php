@@ -10,36 +10,55 @@
 </head>
 <body>
     <div class="container">
-        <?php foreach($stack as [$e, $trace]): ?>
+        <?php foreach ($stack as $trace): ?>
         <div class="section">
-            <h2><?php echo get_class($e); ?></h2>
-            <p><?php echo $e->getMessage(); ?></p>
-            <p class="quiet"><code><?php echo $e->getFile(); ?></code> on line <code><?php echo $e->getLine(); ?></code></p>
+            <h2><?php echo get_class($trace->getException()); ?></h2>
+            <p><?php echo $trace->getException()->getMessage(); ?></p>
+            <p class="quiet"><code><?php echo $trace->getException()->getFile(); ?></code> on line <code><?php echo $trace->getException()->getLine(); ?></code></p>
 
-            <?php echo $trace->getContext()->getSnippet(); ?>
+            <div class="block">
+            <?php
+            $lines = $trace->getContext()->getPlaceInFile();
+            $pad = \strlen((string) \max(\array_keys($lines)));
+            foreach ($lines as $lineNumber => $code) {
+                $line = \str_pad((string) $lineNumber, $pad, ' ', STR_PAD_LEFT);
+                $class = ['line'];
+                if ($e->getLine() == $lineNumber) {
+                    $class[] = 'highlight';
+                }
+                $className = \implode(' ', $class);
+                printf(
+                    '<span class="%s"><span class="line-number">%s</span> %s</span>',
+                    $className,
+                    $line,
+                    \htmlspecialchars($code)
+                );
+            }
+            ?>
+            </div>
 
             <p><b>Stacktrace</b></p>
-            <?php foreach($trace->getFrames() as $frame): ?>
+            <?php foreach ($trace->getFrames() as $frame): ?>
             <div class="frame">
                 <div class="frame-header">
                     <span class="quiet">
                         <code><?php echo $frame->getCaller(); ?></code>
-                        <?php if($frame->hasFile()): ?>
+                        <?php if ($frame->hasFile()): ?>
                         in <code><?php echo $frame->getFile(); ?></code> on line <code><?php echo $frame->getLine(); ?></code>
                         <?php endif; ?>
                     </span>
                 </div>
-                <?php if($frame->hasContext() || $frame->hasArgument()): ?>
+                <?php if ($frame->hasContext() || $frame->hasArgument()): ?>
                 <div class="frame-body">
-                    <?php if($frame->hasContext()): ?>
+                    <?php if ($frame->hasContext()): ?>
                     <?php echo $frame->getContext()->getSnippet(); ?>
                     <?php endif; ?>
 
-                    <?php if($frame->hasArgument()): ?>
+                    <?php if ($frame->hasArgument()): ?>
                     <p><b>Arguments</b></p>
                     <table class="table">
                         <tbody>
-                            <?php foreach($frame->getArguments() as $name => $arg): ?>
+                            <?php foreach ($frame->getArguments() as $name => $arg): ?>
                             <tr>
                                 <td width="20%"><code><?php echo $name; ?></code></td>
                                 <td><code><?php echo $arg; ?></code></td>

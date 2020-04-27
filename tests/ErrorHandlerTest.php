@@ -6,12 +6,18 @@ use PHPUnit\Framework\TestCase;
 
 class ErrorHandlerTest extends TestCase
 {
-    public function testAttach(): void
+    public function testErrors(): void
     {
-        $listeners = new \SplObjectStorage;
-        $error = new \Error\ErrorHandler($listeners);
-        $handler = $this->createMock(\Error\Handler\HandlerInterface::class);
-        $error->attach($handler);
-        $this->assertTrue($listeners->count() === 1);
+        $error = new \Error\ErrorHandler();
+        $error->attach(new class($this) implements \Error\Handler\HandlerInterface {
+            protected $test;
+            public function __construct($test) {
+                $this->test = $test;
+            }
+            public function handle(\Throwable $exception): void {
+                $this->test->assertEquals('yo', $exception->getMessage());
+            }
+        });
+        $error->onException(new \Exception('yo'));
     }
 }

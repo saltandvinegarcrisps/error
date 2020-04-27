@@ -2,7 +2,6 @@
 
 namespace Error\Handler;
 
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Throwable;
 

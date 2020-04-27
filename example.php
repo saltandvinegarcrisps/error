@@ -8,7 +8,7 @@ require __DIR__ . '/vendor/autoload.php';
 $error = new \Error\ErrorHandler;
 
 if ('cli' === php_sapi_name()) {
-    $error->attach(new \Error\Handler\ConsoleHandler);
+    $error->attach(new \Error\Handler\ConsoleHandler());
 } else {
     $error->attach(new \Error\Handler\WebHandler($debug = true));
 }

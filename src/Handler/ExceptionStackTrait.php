@@ -2,19 +2,13 @@
 
 namespace Error\Handler;
 
-use Error\Stacktrace;
+use Error\Stack;
 use Throwable;
 
 trait ExceptionStackTrait
 {
-    protected function getStack(Throwable $e): array
+    protected function getStack(Throwable $e): Stack
     {
-        $stack = [[$e, new Stacktrace($e)]];
-
-        while ($e = $e->getPrevious()) {
-            $stack[] = [$e, new Stacktrace($e)];
-        }
-
-        return $stack;
+        return new Stack($e);
     }
 }
