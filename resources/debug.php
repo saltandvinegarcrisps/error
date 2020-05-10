@@ -51,7 +51,26 @@
                 <?php if ($frame->hasContext() || $frame->hasArgument()): ?>
                 <div class="frame-body">
                     <?php if ($frame->hasContext()): ?>
-                    <?php echo $frame->getContext()->getSnippet(); ?>
+                    <div class="block">
+                    <?php
+                    $lines = $frame->getContext()->getPlaceInFile();
+                    $pad = \strlen((string) \max(\array_keys($lines)));
+                    foreach ($lines as $lineNumber => $code) {
+                        $line = \str_pad((string) $lineNumber, $pad, ' ', STR_PAD_LEFT);
+                        $class = ['line'];
+                        if ($e->getLine() == $lineNumber) {
+                            $class[] = 'highlight';
+                        }
+                        $className = \implode(' ', $class);
+                        printf(
+                            '<span class="%s"><span class="line-number">%s</span> %s</span>',
+                            $className,
+                            $line,
+                            \htmlspecialchars($code)
+                        );
+                    }
+                    ?>
+                    </div>
                     <?php endif; ?>
 
                     <?php if ($frame->hasArgument()): ?>

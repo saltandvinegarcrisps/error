@@ -3,11 +3,12 @@
 namespace Error\Handler;
 
 use Error\Frame;
+use Error\Traits;
 use Throwable;
 
 class JsonHandler implements HandlerInterface
 {
-    use ExceptionMessageTrait, ExceptionStackTrait;
+    use Traits\ExceptionMessage, Traits\ExceptionStack;
 
     public function getData(Throwable $e): array
     {

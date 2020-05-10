@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Error\Handler;
+namespace Error\Traits;
 
 use Error\Stack;
 use Throwable;
 
-trait ExceptionStackTrait
+trait ExceptionStack
 {
     protected function getStack(Throwable $e): Stack
     {

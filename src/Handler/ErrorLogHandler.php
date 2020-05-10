@@ -2,14 +2,15 @@
 
 namespace Error\Handler;
 
+use Error\Traits;
 use Throwable;
 
 class ErrorLogHandler implements HandlerInterface
 {
-    use ExceptionMessageTrait;
+    use Traits\ExceptionMessage;
 
     public function handle(Throwable $e): void
     {
-        \error_log($this->getMessage($e));
+        \error_log($this->getMessageWithSource($e));
     }
 }

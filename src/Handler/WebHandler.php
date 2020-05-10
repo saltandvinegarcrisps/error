@@ -2,11 +2,12 @@
 
 namespace Error\Handler;
 
+use Error\Traits;
 use Throwable;
 
 class WebHandler implements HandlerInterface
 {
-    use ExceptionMessageTrait, ExceptionStackTrait;
+    use Traits\ExceptionMessage, Traits\ExceptionStack;
 
     protected $debug;
 

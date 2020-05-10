@@ -2,14 +2,15 @@
 
 namespace Error\Handler;
 
+use Error\Traits;
 use Throwable;
 
 class EchoHandler implements HandlerInterface
 {
-    use ExceptionMessageTrait;
+    use Traits\ExceptionMessage;
 
     public function handle(Throwable $e): void
     {
-        echo $this->getMessage($e);
+        echo $e;
     }
 }

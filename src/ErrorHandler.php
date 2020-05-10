@@ -29,16 +29,6 @@ class ErrorHandler
     }
 
     /**
-     * Set fatal errors
-     *
-     * @param int $fatalErrors
-     */
-    public function setFatalErrors(int $fatalErrors): void
-    {
-        $this->fatalErrors = $fatalErrors;
-    }
-
-    /**
      * Register callback for handling errors
      *
      * @param int $reservedMemorySize Size in KBs

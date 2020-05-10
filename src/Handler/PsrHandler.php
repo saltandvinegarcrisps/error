@@ -2,12 +2,13 @@
 
 namespace Error\Handler;
 
+use Error\Traits;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 class PsrHandler implements HandlerInterface
 {
-    use ExceptionMessageTrait;
+    use Traits\ExceptionMessage;
 
     protected $logger;
 

@@ -2,11 +2,12 @@
 
 namespace Error\Handler;
 
+use Error\Traits;
 use Throwable;
 
 class ConsoleHandler implements HandlerInterface
 {
-    use ExceptionMessageTrait, ExceptionStackTrait;
+    use Traits\ExceptionMessage, Traits\ExceptionStack;
 
     protected function write(string $msg): void
     {
@@ -24,8 +25,7 @@ class ConsoleHandler implements HandlerInterface
         $stack = $this->getStack($e);
         $this->writeln('');
         foreach ($stack as $trace) {
-            $this->writeln(\get_class($trace->getException()));
-            $this->writeln($trace->getException()->getMessage());
+            $this->writeln($this->getMessage($trace->getException()));
             $this->writeln('');
             foreach ($trace->getFrames() as $index => $frame) {
                 if (!$frame->hasFile()) {

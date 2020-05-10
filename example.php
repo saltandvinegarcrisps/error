@@ -15,40 +15,20 @@ if ('cli' === php_sapi_name()) {
 
 $error->register();
 
-class Project
-{
-    public static function has($filename): bool
-    {
-        return is_file('/this/should/fail/'.$filename);
-    }
-
-    public static function create($filename)
-    {
-        (new Symfony\Component\Filesystem\Filesystem)->touch('/this/should/fail/'.$filename);
-    }
+function testNotice(): void {
+    $a = [];
+    $b = 0;
+    echo $a[$b];
 }
 
-function createProject(...$files)
-{
-    foreach ($files as $filename) {
-        try {
-            createFile($filename);
-        } catch (Exception $e) {
-            throw new Exception('Failed', $e->getCode(), $e);
-        }
-    }
+function testWarning(): void {
+    $c = null;
+    foreach($c as $d) {}
 }
 
-function createFile($filename)
-{
-    Project::create($filename);
+function tests(): void {
+    // testNotice();
+    testWarning();
 }
 
-function setupProject()
-{
-    return function ($extra) {
-        createProject('readme.md', 'composer.json', 'package.json');
-    };
-}
-
-setupProject()('test');
+tests();

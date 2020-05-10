@@ -26,33 +26,33 @@ class Trace
         return new Context($this->exception->getFile(), $this->exception->getLine());
     }
 
-    public function getFrames(): array
+    protected function getDebugBacktrace(): array
     {
-        $trace = $this->exception->getTrace();
+        $trace = [];
+        $capture = false;
 
-        $containsException = \array_reduce($trace, function (bool $carry, array $frame) {
-            if (
-                \array_key_exists('file', $frame) &&
-                \array_key_exists('line', $frame) &&
-                $frame['file'] === $this->exception->getFile() &&
-                $frame['line'] === $this->exception->getLine()
-            ) {
-                return true;
+        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
+            if (isset($frame['file'], $frame['line']) && $this->exception->getFile() === $frame['file'] && $this->exception->getLine() === $frame['line']) {
+                $capture = true;
             }
-            return $carry;
-        }, false);
-
-        if (!$containsException) {
-            \array_unshift($trace, [
-                'file' => $this->exception->getFile(),
-                'line' => $this->exception->getLine(),
-                'function' => '{main}',
-            ]);
+            if ($capture) {
+                $trace[] = $frame;
+            }
         }
 
+        return $trace;
+    }
+
+    protected function getBacktrace(): array
+    {
+        return $this->exception->getTrace();
+    }
+
+    public function getFrames(): array
+    {
         $frames = [];
 
-        foreach ($trace as $params) {
+        foreach ($this->getBacktrace() as $params) {
             $frames[] = Frame::create($params);
         }
 

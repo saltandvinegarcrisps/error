@@ -2,11 +2,12 @@
 
 namespace Error\Handler;
 
+use Error\Traits;
 use Throwable;
 
 class SyslogHandler implements HandlerInterface
 {
-    use ExceptionMessageTrait;
+    use Traits\ExceptionMessage;
 
     protected $ident;
 
@@ -18,7 +19,7 @@ class SyslogHandler implements HandlerInterface
     public function handle(Throwable $e): void
     {
         \openlog($this->ident, LOG_PID | LOG_PERROR, LOG_USER);
-        \syslog(LOG_ERR, $this->getMessage($e));
+        \syslog(LOG_ERR, $this->getMessageWithSource($e));
         \closelog();
     }
 }
