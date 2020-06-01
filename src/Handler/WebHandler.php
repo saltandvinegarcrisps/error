@@ -21,11 +21,6 @@ class WebHandler implements HandlerInterface
 
     protected function render(Throwable $e): string
     {
-        function e(string $text): string
-        {
-            return \htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE);
-        }
-
         \ob_start();
 
         $stack = $this->getStack($e);

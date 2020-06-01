@@ -1,4 +1,11 @@
-<!DOCTYPE html>
+<?php
+
+function e(string $text): string
+{
+    return \htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE);
+}
+
+?><!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
