@@ -13,7 +13,7 @@
         <?php foreach ($stack as $trace): ?>
         <div class="section">
             <h2><?php echo get_class($trace->getException()); ?></h2>
-            <p><?php echo $trace->getException()->getMessage(); ?></p>
+            <p><?php echo e($trace->getException()->getMessage()); ?></p>
             <p class="quiet"><code><?php echo $trace->getException()->getFile(); ?></code> on line <code><?php echo $trace->getException()->getLine(); ?></code></p>
 
             <div class="block">
@@ -31,7 +31,7 @@
                     '<span class="%s"><span class="line-number">%s</span> %s</span>',
                     $className,
                     $line,
-                    \htmlspecialchars($code)
+                    e($code)
                 );
             }
             ?>
@@ -66,7 +66,7 @@
                             '<span class="%s"><span class="line-number">%s</span> %s</span>',
                             $className,
                             $line,
-                            \htmlspecialchars($code)
+                            e($code)
                         );
                     }
                     ?>
@@ -80,7 +80,7 @@
                             <?php foreach ($frame->getArguments() as $name => $arg): ?>
                             <tr>
                                 <td width="20%"><code><?php echo $name; ?></code></td>
-                                <td><code><?php echo $arg; ?></code></td>
+                                <td><code><?php echo e($arg); ?></code></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
