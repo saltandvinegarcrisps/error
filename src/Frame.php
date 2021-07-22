@@ -139,35 +139,23 @@ class Frame implements JsonSerializable
         }
     }
 
-    protected function normaliseArray($value): string
+    protected function normaliseArray(array $value, int $max = 10): string
     {
-        $count = \count($value);
+        $values = [];
 
-        if ($count === 0) {
-            return 'Empty Array';
-        }
+        $sequential = $value === array_values($value);
 
-        if ($count > 100) {
-            return 'Array of length ' . $count;
-        }
-
-        $types = [];
-
-        foreach ($value as $item) {
-            $type = \gettype($item);
-            if ('object' === $type) {
-                $type = \get_class($item);
-            }
-            if (!\in_array($type, $types)) {
-                $types[] = $type;
+        foreach ($value as $key => $value) {
+            $values[] = $sequential ?
+                $this->normalise($value) :
+                sprintf('%s: %s', $this->normalise($key), $this->normalise($value))
+            ;
+            if (count($values) === $max) {
+                $values[] = sprintf('%u more...', count($values) - $max);
             }
         }
 
-        if (\count($types) > 3) {
-            return 'Mixed Array of length ' . $count;
-        }
-
-        return 'Array<'.\implode('|', $types).'> of length ' . $count;
+        return sprintf('[%s]', implode(', ', $values));
     }
 
     protected function normalise($value): string
