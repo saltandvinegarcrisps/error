@@ -3,52 +3,40 @@
 namespace Error;
 
 use JsonSerializable;
+use InvalidArgumentException;
 
 class Frame implements JsonSerializable
 {
-    protected $file;
+    protected ?string $file;
 
-    protected $line;
+    protected ?int $line;
 
-    protected $caller;
+    protected ?string $caller;
 
-    protected $args = [];
+    protected ?array $args;
+
+    public function __construct(?string $file = null, ?int $line = null, ?string $caller = null, ?array $args = null)
+    {
+        $this->file = $file;
+        $this->line = $line;
+        $this->caller = $caller;
+        $this->args = null === $args ? null : $this->setArguments($args);
+    }
 
     public static function create(array $params): self
     {
-        $frame = new self;
-
-        if (isset($params['file'])) {
-            $frame->setFile($params['file']);
-        }
-
-        if (isset($params['line'])) {
-            $frame->setLine($params['line']);
-        }
-
-        if (isset($params['class'])) {
-            $frame->setCaller(\sprintf('%s%s%s', $params['class'], $params['type'], $params['function']));
+        if (isset($params['class'], $params['type'], $params['function'])) {
+            $params['caller'] = \sprintf('%s%s%s', $params['class'], $params['type'], $params['function']);
         } elseif (isset($params['function'])) {
-            $frame->setCaller($params['function']);
+            $params['caller'] = $params['function'];
         }
 
-        if (isset($params['args'])) {
-            $frame->setArguments($params['args']);
-        } else {
-            $frame->setArguments([]);
-        }
-
-        return $frame;
+        return new self($params['file'] ?? null, $params['line'] ?? null, $params['caller'] ?? null, $params['args'] ?? null);
     }
 
     public function getFile(): string
     {
         return $this->file;
-    }
-
-    public function setFile(string $file): void
-    {
-        $this->file = $file;
     }
 
     public function hasFile(): bool
@@ -61,11 +49,6 @@ class Frame implements JsonSerializable
         return $this->line;
     }
 
-    public function setLine(int $line): void
-    {
-        $this->line = $line;
-    }
-
     public function hasLine(): bool
     {
         return $this->line !== null;
@@ -73,27 +56,22 @@ class Frame implements JsonSerializable
 
     public function hasCaller(): bool
     {
-        return !empty($this->caller);
+        return null !== $this->caller;
     }
 
-    public function getCaller(): string
+    public function getCaller(): ?string
     {
         return $this->caller;
     }
 
-    public function setCaller(string $caller): void
+    public function getArguments(): ?array
     {
-        $this->caller = $caller;
-    }
-
-    public function getArguments(): array
-    {
-        return $this->args ?: [];
+        return $this->args;
     }
 
     public function hasArgument(): bool
     {
-        return !empty($this->args);
+        return is_array($this->args) && count($this->args) > 0;
     }
 
     protected function getParams(): array
@@ -101,7 +79,7 @@ class Frame implements JsonSerializable
         $params = [];
         $caller = $this->getCaller();
 
-        if (empty($caller)) {
+        if (null === $caller) {
             return $params;
         }
 
@@ -127,7 +105,7 @@ class Frame implements JsonSerializable
         return $params;
     }
 
-    public function setArguments(array $args): void
+    protected function setArguments(array $args): void
     {
         $paramNames = $this->getParams();
         $this->args = [];

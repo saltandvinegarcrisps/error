@@ -26,26 +26,25 @@ class Trace
         return new Context($this->exception->getFile(), $this->exception->getLine());
     }
 
-    protected function getDebugBacktrace(): array
+    protected function containsSource(array $frame): bool
     {
-        $trace = [];
-        $capture = false;
-
-        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $frame) {
-            if (isset($frame['file'], $frame['line']) && $this->exception->getFile() === $frame['file'] && $this->exception->getLine() === $frame['line']) {
-                $capture = true;
-            }
-            if ($capture) {
-                $trace[] = $frame;
-            }
-        }
-
-        return $trace;
+        return isset($frame['file'], $frame['file']) &&
+            $frame['file'] == $this->exception->getFile() &&
+            $frame['line'] == $this->exception->getLine();
     }
 
     protected function getBacktrace(): array
     {
-        return $this->exception->getTrace();
+        $trace = $this->exception->getTrace();
+
+        if (!$this->containsSource($trace[0])) {
+            array_unshift($trace, [
+                'file' => $this->exception->getFile(),
+                'line' => $this->exception->getLine(),
+            ]);
+        }
+
+        return $trace;
     }
 
     public function getFrames(): array
