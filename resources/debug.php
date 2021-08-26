@@ -1,8 +1,10 @@
 <?php
 
-function e(string $text): string
-{
-    return \htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE);
+if (!function_exists('e')) {
+    function e(string $text): string
+    {
+        return \htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE);
+    }
 }
 
 ?><!DOCTYPE html>
