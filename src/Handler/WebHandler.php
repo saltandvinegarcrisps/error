@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Error\Handler;
 
@@ -7,7 +9,8 @@ use Throwable;
 
 class WebHandler implements HandlerInterface
 {
-    use Traits\ExceptionMessage, Traits\ExceptionStack;
+    use Traits\ExceptionMessage;
+    use Traits\ExceptionStack;
 
     protected $debug;
 

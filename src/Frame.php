@@ -1,26 +1,28 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Error;
 
 use JsonSerializable;
-use InvalidArgumentException;
+use function class_exists;
 
 class Frame implements JsonSerializable
 {
-    protected ?string $file;
+    protected $file;
 
-    protected ?int $line;
+    protected $line;
 
-    protected ?string $caller;
+    protected $caller;
 
-    protected ?array $args;
+    protected $args;
 
     public function __construct(?string $file = null, ?int $line = null, ?string $caller = null, ?array $args = null)
     {
         $this->file = $file;
         $this->line = $line;
         $this->caller = $caller;
-        $this->args = null === $args ? null : $this->setArguments($args);
+        $this->args = null === $args ? null : $this->createArguments($args);
     }
 
     public static function create(array $params): self
@@ -85,6 +87,9 @@ class Frame implements JsonSerializable
 
         if (\strpos($caller, '->') || \strpos($caller, '::')) {
             [$class, $method] = \explode(' ', \str_replace(['->', '::'], ' ', $caller));
+            if (!class_exists($class)) {
+                return $params;
+            }
             try {
                 $func = (new \ReflectionClass($class))->getMethod($method);
             } catch (\ReflectionException  $e) {
@@ -105,16 +110,18 @@ class Frame implements JsonSerializable
         return $params;
     }
 
-    protected function setArguments(array $args): void
+    protected function createArguments(array $args): array
     {
         $paramNames = $this->getParams();
-        $this->args = [];
+        $normalised = [];
 
         foreach (\array_values($args) as $index => $arg) {
             $name = \array_key_exists($index, $paramNames) ?
                 $paramNames[$index]->getName() : 'param'.($index+1);
-            $this->args[$name] = $this->normalise($arg);
+            $normalised[$name] = $this->normalise($arg);
         }
+
+        return $normalised;
     }
 
     protected function normaliseArray(array $value, int $max = 10): string
@@ -174,7 +181,7 @@ class Frame implements JsonSerializable
         if ($this->hasContext()) {
             return $this->getFile().':'.$this->getLine();
         }
-        return $this->getCaller();
+        return $this->getCaller() ?? '';
     }
 
     public function toArray(): array

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Error;
 
@@ -19,7 +21,7 @@ class ErrorHandler
     protected $listeners;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $reservedMemory;
 
@@ -113,6 +115,9 @@ class ErrorHandler
 
         try {
             foreach ($this->listeners as $listener) {
+                if (!method_exists($listener, 'handle')) {
+                    continue;
+                }
                 $listener->handle($exception);
             }
         } catch (Throwable $exceptionalException) {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Error\Handler;
 
@@ -8,7 +10,8 @@ use Throwable;
 
 class JsonHandler implements HandlerInterface
 {
-    use Traits\ExceptionMessage, Traits\ExceptionStack;
+    use Traits\ExceptionMessage;
+    use Traits\ExceptionStack;
 
     public function getData(Throwable $e): array
     {

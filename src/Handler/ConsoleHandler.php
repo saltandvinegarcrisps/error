@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Error\Handler;
 
@@ -7,11 +9,15 @@ use Throwable;
 
 class ConsoleHandler implements HandlerInterface
 {
-    use Traits\ExceptionMessage, Traits\ExceptionStack;
+    use Traits\ExceptionMessage;
+    use Traits\ExceptionStack;
 
     protected function write(string $msg): void
     {
         $stream = \fopen('php://stderr', 'wb');
+        if (false === $stream) {
+            throw new HandlerException('Failed to open steam');
+        }
         \fwrite($stream, $msg);
     }
 
